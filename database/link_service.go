@@ -29,3 +29,13 @@ func (ls LinkService) Create(l *mail_ru.Link) error {
 func (ls LinkService) Update(l *mail_ru.Link) error {
 	return ls.Create(l)
 }
+
+func (ls LinkService) TotalMatches() int {
+	var total int
+
+	for _, l := range ls.Database.Links {
+		total += l.Matches
+	}
+
+	return total
+}

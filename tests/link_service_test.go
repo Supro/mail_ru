@@ -41,7 +41,7 @@ func TestLinkServiceCreate(t *testing.T) {
 
 	url := "http://ya.ru"
 
-	l := &mail_ru.Link{Url: url, Count: 0}
+	l := &mail_ru.Link{Url: url, Matches: 0}
 
 	s.Create(l)
 
@@ -67,7 +67,7 @@ func TestLinkServiceUpdate(t *testing.T) {
 
 	expect := 888
 
-	l.Count = 888
+	l.Matches = 888
 
 	s.Update(l)
 
@@ -77,9 +77,27 @@ func TestLinkServiceUpdate(t *testing.T) {
 		t.Error(err)
 	}	
 
-	got := fl.Count
+	got := fl.Matches
 
 	if expect != got {
 		t.Errorf("Record not updated, v% != %v", expect, got)
+	}
+}
+
+func TestLinkServiceTotalMatches(t *testing.T) {
+	db := buildDatabase()
+
+	s := database.LinkService{db}
+
+	l := &mail_ru.Link{"http://godaddy.com", 1}
+
+	s.Create(l)
+
+	expect := 2
+
+	got := s.TotalMatches()
+
+	if got != expect {
+		t.Errorf("Expected total matches to be %v, got %v")
 	}
 }
