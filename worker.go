@@ -26,6 +26,8 @@ type Worker struct {
 func NewWorker() *Worker {
 	w := &Worker{}
 
+	w.CountChan = make(chan int)
+
 	return w
 }
 

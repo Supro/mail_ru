@@ -19,7 +19,6 @@ func main() {
 
 	w.Match = "go"
 	w.Limit = 5
-	w.CountChan = make(chan int)
 	w.LinkService = ls
 
 	w.Process(reader)

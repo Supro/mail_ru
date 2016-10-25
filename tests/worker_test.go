@@ -2,6 +2,7 @@ package tests
 
 import (
 	"bytes"
+	"runtime"
 	"sync"
 	"testing"
 
@@ -10,13 +11,14 @@ import (
 )
 
 func TestWoker(t *testing.T) {
-	reader := bytes.NewBufferString("http://google.com\nhttp://yandex.ru\nhttp://mail.ru\nhttp://godaddy.com\n")
-	//done := make(chan bool)
+	reader := bytes.NewBufferString("http://google.com\nhttp://yandex.ru\nhttp://mail.ru\nhttp://godaddy.com\nhttp://godaddy.com")
 
 	w := &mail_ru.Worker{Match: "go", Limit: 1, CountChan: make(chan int)}
 	wg := &sync.WaitGroup{}
 
-	wg.Add(4)
+	var routines int
+
+	wg.Add(5)
 
 	ls := mocks.LinkService{
 		CreateFunc: func(l *mail_ru.Link) error {
@@ -26,6 +28,12 @@ func TestWoker(t *testing.T) {
 				t.Errorf("Worker current count can't be greater than limit")
 			}
 
+			rs := runtime.NumGoroutine()
+
+			if rs > routines+1 {
+				t.Errorf("Too many routines are working now")
+			}
+
 			return nil
 		},
 	}
@@ -33,6 +41,8 @@ func TestWoker(t *testing.T) {
 	w.LinkService = ls
 
 	go w.Process(reader)
+
+	routines = runtime.NumGoroutine()
 
 	wg.Wait()
 }
